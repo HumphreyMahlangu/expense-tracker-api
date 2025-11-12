@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+
+
 @Entity // Tells Spring this class is a database table
 @Table(name = "expenses") // Links this to the expenses table
 public class Expense {
@@ -29,6 +31,10 @@ public class Expense {
     @PastOrPresent(message = "Date cannot be in the future") // date must be today or in the past
     @Column(name = "date", nullable = false)
     private LocalDate date;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id") // This is the foreign key column we created
+    private Category category;
 
     //deafault constructor
     public Expense() {
@@ -74,5 +80,12 @@ public class Expense {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }
