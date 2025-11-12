@@ -1,7 +1,7 @@
 package za.ac.mycput.expensetrackerapi.controller;
 
 
-
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +27,7 @@ public class ExpenseController {
 
     //method that handles Http POST requests to add expenses to "/api/expenses/"
     @PostMapping
-    public Expense createExpense(@RequestBody Expense expense) {
+    public Expense createExpense(@Valid @RequestBody Expense expense) {
         return expenseRepository.save(expense);
     }
 
@@ -48,7 +48,7 @@ public class ExpenseController {
 
     //handles Https PUTT requests to update the expenses
     @PutMapping("/{id}")
-    public ResponseEntity<Expense> updateExpense(@PathVariable Long id, @RequestBody Expense expenseDetails) {
+    public ResponseEntity<Expense> updateExpense(@PathVariable Long id,@Valid @RequestBody Expense expenseDetails) {
         Optional<Expense> optionalExpense = expenseRepository.findById(id);
 
         if (optionalExpense.isPresent()) {
