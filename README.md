@@ -35,11 +35,18 @@ Log in to your local MySQL server and create a new database:
 CREATE DATABASE expense_tracker;
 USE expense_tracker;
 
+CREATE TABLE categories (
+    id   INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
+);
+
 CREATE TABLE expenses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     description TEXT NOT NULL,
     amount DECIMAL(10, 2) NOT NULL,
-    date DATE NOT NULL
+    date DATE NOT NULL,
+    category_id INT,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 ```
 ### 4. Configure the Application
@@ -58,7 +65,27 @@ mvn spring-boot:run
 ```
 The application will start on:
 http://localhost:8080
-## API Endpoints (Usage)
+
+## Catergory Endpoints (Usage)
+You can use Postman or cURL to test the API.<br>
+**POST** /api/categories | Create a new category <br>
+**GET** /api/categories | Retrieve all categories <br>
+**DELETE** /api/categories/{id} | Delete a category by ID
+### Example: Create a Category (POST)
+URL:
+```bash
+POST http://localhost:8080/api/categories
+```
+Body (JSON):      
+```json
+{
+    "name": "Food"
+}
+```         
+
+
+
+## Expense Endpoints (Usage)
 You can use Postman or cURL to test the API.<br>
 **POST** /api/expenses | Create a new expense <br>
 **GET** /api/expenses | Retrieve all expenses <br>
@@ -75,6 +102,9 @@ Body (JSON):
 {
     "description": "Groceries",
     "amount": 250.75,
-    "date": "2025-11-08"
+    "date": "2025-11-08",
+    "categoryId":{
+        "id": 1   
+    }
 }
 ```
