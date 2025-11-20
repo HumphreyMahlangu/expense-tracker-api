@@ -66,6 +66,43 @@ mvn spring-boot:run
 The application will start on:
 http://localhost:8080
 
+##  Security & Authentication
+
+This API is secured using **JSON Web Tokens (JWT)**.
+
+* **Public Endpoints:** You can access `/api/auth/**` without logging in.
+* **Protected Endpoints:** All other endpoints (`/api/expenses/**`, `/api/categories/**`) require a valid JWT.
+
+### How to Authenticate
+
+1.  **Register a User:**
+    * `POST /api/auth/register`
+    * Body: `{"username": "user1", "password": "password123"}`
+2.  **Login:**
+    * `POST /api/auth/login`
+    * Body: `{"username": "user1", "password": "password123"}`
+    * **Response:** `{"token": "eyJhbGci..."}`
+3.  **Access Protected Data:**
+    * Copy the token string.
+    * Add it to the **Authorization** header of your request:
+        * **Key:** `Authorization`
+        * **Value:** `Bearer eyJhbGci...`
+
+---
+
+## 🧪 API Endpoints
+
+### Auth Endpoints (`/api/auth`)
+
+**POST**`/api/auth/register` | Register a new user account. <br>
+**POST** `/api/auth/login` | Login and receive a JWT. 
+
+### Expense Endpoints (Requires Token)
+
+**GET**`/api/expenses` | Get all expenses.<br>
+**POST**`/api/expenses` | Create a new expense.<br>
+**GET**`/api/expenses/total` | Get total sum of expenses.
+
 ## Catergory Endpoints (Usage)
 You can use Postman or cURL to test the API.<br>
 **POST** /api/categories | Create a new category <br>
