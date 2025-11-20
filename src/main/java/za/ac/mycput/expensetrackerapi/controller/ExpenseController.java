@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.mycput.expensetrackerapi.model.Expense;
+import za.ac.mycput.expensetrackerapi.service.ExpenseService;
 import za.ac.mycput.expensetrackerapi.repository.ExpenseRepository;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/expenses") // Base url for all the mthods in the class
@@ -16,67 +18,63 @@ public class ExpenseController {
 
 
     @Autowired
-    private ExpenseRepository expenseRepository;
+    private ExpenseService expenseService;
 
     //Method that handles Https get requests to find all expenses to "api/expenses"
+    @GetMapping("/total")
+    public BigDecimal getTotalExpenses() {
+        return expenseService.calculateTotalExpenses();
+    }
     @GetMapping
     public List<Expense> getAllExpenses() {
-        // I use a built in .finndAll() method
-        return expenseRepository.findAll();
+        return expenseService.getAllExpenses(); // Call service
     }
 
     //method that handles Http POST requests to add expenses to "/api/expenses/"
     @PostMapping
     public Expense createExpense(@Valid @RequestBody Expense expense) {
-        return expenseRepository.save(expense);
+        return expenseService.saveExpense(expense);
     }
 
 
     @GetMapping("/{id}")
     public ResponseEntity<Expense> getExpenseById(@PathVariable Long id) {
-        // Find the expense by its ID
-        Optional<Expense> expense = expenseRepository.findById(id);
+        Optional<Expense> expense = expenseService.getExpenseById(id);
 
-        // checking if the expense is found
         if (expense.isPresent()) {
-            return ResponseEntity.ok(expense.get()); // Return 200 OK with the expense
+            return ResponseEntity.ok(expense.get());
         } else {
-            return ResponseEntity.notFound().build(); // Return 404 Not Found
+            return ResponseEntity.notFound().build();
         }
     }
 
-
-    //handles Https PUTT requests to update the expenses
     @PutMapping("/{id}")
     public ResponseEntity<Expense> updateExpense(@PathVariable Long id,@Valid @RequestBody Expense expenseDetails) {
-        Optional<Expense> optionalExpense = expenseRepository.findById(id);
+        Optional<Expense> optionalExpense = expenseService.getExpenseById(id);
 
         if (optionalExpense.isPresent()) {
             Expense existingExpense = optionalExpense.get();
 
-            // Update the fields of the existing expense
+
             existingExpense.setDescription(expenseDetails.getDescription());
             existingExpense.setAmount(expenseDetails.getAmount());
             existingExpense.setDate(expenseDetails.getDate());
 
-            // Save the updated expense back to the database
-            Expense updatedExpense = expenseRepository.save(existingExpense);
+
+            Expense updatedExpense = expenseService.saveExpense(existingExpense);
             return ResponseEntity.ok(updatedExpense);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-
-    // Delete method to handle delete HTTP requests to "/api/exenses/{id}"
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteExpense(@PathVariable Long id) {
-        Optional<Expense> optionalExpense = expenseRepository.findById(id);
+        Optional<Expense> expense = expenseService.getExpenseById(id);
 
-        if (optionalExpense.isPresent()) {
-            //if the expense exists it gets deleted
-            expenseRepository.deleteById(id);
-            return ResponseEntity.noContent().build(); // Return 204 No Content
+        if (expense.isPresent()) {
+            expenseService.deleteExpense(id);
+            return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
         }
